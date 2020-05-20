@@ -32,27 +32,29 @@ EventGroupHandle_t task_watchdog;
 //\nRaipur\r\n";
 
 
-//char* Message=(char *)malloc(10*sizeof(char));
+
+
 char Message[10];
 int k=45;
+int j=89;
+
 
 void itoa(int a, char* Message, int *num)
 {
 	char *Msg=Message;
+	*num=10;
 	for(int i=9;i>=0;i--)
 	{
 		Message[i]=a%10+48;
 		a=(a-a%10)/10;
 	}
 
-	//for(Msg,i;Msg[0]=='0';Msg++,i--);
 	while(Msg[0]==48)
 	{
 		Msg++;
 		(*num)--;
 	}
 }
-
 
 
 /* Timeout in ms for blocking operations */
@@ -145,13 +147,16 @@ void Task1( void *pvParameters )
 	{
 		vTaskSuspend(NULL);
 		itoa(k,Message,&number);
-		LPUART_DRV_SendData(INST_UART0, &Message[10-number], number);
-		uint32_t result = xEventGroupWaitBits(task_watchdog, BIT1, pdTRUE, pdTRUE, 2000 );
-		if(result==BIT1)
-		{
+		LPUART_DRV_SendDataBlocking(INST_UART0, &Message[10-number], number,2000);
+
+//		uint32_t result = xEventGroupWaitBits(task_watchdog, BIT1, pdTRUE, pdTRUE, 2000 );
+//		if(result==BIT1)
+//		{
+			itoa(j,Message,&number);
+			LPUART_DRV_SendDataBlocking(INST_UART0, &Message[10-number], number,2000);
 			PINS_DRV_TogglePins(LED_GPIO, (1 << LED1));
 			number =10;
-		}
+//		}
 	}
 }
 
